@@ -1,5 +1,5 @@
 from device import Device 
-from dht11_channel_test import DH11Channel
+from dht11_channel import DH11Channel
 from relay_channel import RelayChannel
 
 DATA_CHECK_INTERVAL = 2

@@ -3,21 +3,23 @@ import time
 import RPi.GPIO as GPIO
 
 class RelayChannel(Channel):
-
+    PIN = 19
     _last_value = None
     def update(self, value):
         self.value = value
         if self.value:
-            GPIO.output(22,GPIO.HIGH)
+            print("--T--")
+            GPIO.output(self.PIN,GPIO.HIGH)
         else:
-            GPIO.output(22,GPIO.LOW)
+            GPIO.output(self.PIN,GPIO.LOW)
+            print("--F--")
             
         print("--------------Relay update to: %s--------------" %(self.value))
 
     def _checking_loop(self):
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(13,GPIO.OUT)
-       
+        GPIO.setup(self.PIN,GPIO.OUT)
+           
         while True:
             if self.value != self._last_value:
                 self._publish_status() 

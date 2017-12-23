@@ -8,7 +8,7 @@ class DH11Channel(Channel):
     def _checking_loop(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
-        GPIO.cleanup()
+        #GPIO.cleanup()
         instance = dht11.DHT11(pin=26)
      
         last_value = None
