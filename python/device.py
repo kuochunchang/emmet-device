@@ -1,13 +1,14 @@
-from device_model import ChannelStatus, DeviceStatus, DeviceHeartbeat
+from device_model import *
 from channel import Channel
 import paho.mqtt.client as mqtt
 import config
 import time
+from dht11_channel import DH11Channel
 
 
 class Device(object):
 
-    _LOOP_SLEEP_SEC = 1
+    _LOOP_INTERVAL = 5
 
     def __init__(self, device_id):
         self._device_id = device_id
@@ -23,17 +24,16 @@ class Device(object):
         self._mqtt_client.on_message = self._on_mqtt_message
         self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 60)
 
-    def add_channel(self, channel):
+    def add_channel(self, channel: Channel):
         self._channels.append(channel)
+        channel.set_callback(self.on_channel_status_change)
+        channel.start()
 
     def run(self):
-        print("Device id: %s start!" % (self._device_id))
         while True:
             self._publish_heartbeat()
-            for channel in self._channels:
-                channel.publish_status()
-                
-            time.sleep(self._LOOP_SLEEP_SEC)
+            print("Current status: ", self._current_status().json(), len(self._channels))
+            time.sleep(self._LOOP_INTERVAL)
             self._mqtt_client.loop()
 
     def _on_mqtt_connect(self, client, userdata, flags, result_code):
@@ -46,34 +46,28 @@ class Device(object):
         if msg.topic == self._control_topic:
             self._publish_current_status()
 
-    def _publish(self, topic, msg):
+    def _mqtt_publish(self, topic, msg):
         self._mqtt_client.publish(topic, msg)
+        print("Published message to topic: %s: %s" % (topic, msg))
 
     def _current_status(self):
-        channel1 = ChannelStatus("A1", 12)
-        channel2 = ChannelStatus("A2", 22)
         status = DeviceStatus(self._device_id)
-        status.add_channel(channel1)
-        status.add_channel(channel2)
-
+        for chl in self._channels:
+            status.add_channel(ChannelStatus(chl.name, chl.value))
         return status
 
     def _publish_current_status(self):
         print("---", type(self._current_status().json))
-        self._publish(self._status_topic, self._current_status().json())
+        self._mqtt_publish(self._status_topic, self._current_status().json())
 
     def _publish_heartbeat(self):
         heartbeat_msg = self._heartbeat.new().json()
-        self._publish(self._heartbeat_topic, heartbeat_msg)
+        self._mqtt_publish(self._heartbeat_topic, heartbeat_msg)
         print("Heartbeat published: " + heartbeat_msg)
 
     def on_channel_status_change(self, msg):
-        print("_on_channel_status_change:" + msg)
+        status = DeviceStatus(self._device_id)
+        status.add_channel(ChannelStatus(msg.name, msg.value))
+        self._mqtt_publish(self._status_topic, status.json())
 
 
-device = Device("device-0001")
-channel = Channel("A10", device.on_channel_status_change, 1)
-
-channel.start()
-device.add_channel(channel)
-device.run()
