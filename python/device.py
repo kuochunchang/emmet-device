@@ -3,12 +3,11 @@ from channel import Channel
 import paho.mqtt.client as mqtt
 import config
 import time
-from dht11_channel import DH11Channel
 
 
 class Device(object):
 
-    _LOOP_INTERVAL = 5
+    _LOOP_INTERVAL = 1
 
     def __init__(self, device_id):
         self._device_id = device_id
@@ -30,9 +29,9 @@ class Device(object):
         channel.start()
 
     def run(self):
-        while True:
+        while self._mqtt_client.loop:
             self._publish_heartbeat()
-            print("Current status: ", self._current_status().json(), len(self._channels))
+            # print("Current status: ", self._current_status().json(), len(self._channels))
             time.sleep(self._LOOP_INTERVAL)
             self._mqtt_client.loop()
 
@@ -45,6 +44,22 @@ class Device(object):
         print(msg.topic + " " + str(msg.payload))
         if msg.topic == self._control_topic:
             self._publish_current_status()
+        if msg.topic == self._update_topic:
+            self._update_channel_status(str(msg.payload.decode("utf-8","ignore")))
+        
+    def _update_channel_status(self, msg):
+        print("---->" + msg)
+        msg_dict = json.loads(msg)
+        channel_name = msg_dict["name"]
+        value = msg_dict["value"]
+        found = False
+        for chl in self._channels:
+            if chl.name == channel_name:
+                chl.update(value)
+                found = True
+        if not found:
+            print("Can not find channel:" + channel_name)
+       
 
     def _mqtt_publish(self, topic, msg):
         self._mqtt_client.publish(topic, msg)
@@ -63,7 +78,7 @@ class Device(object):
     def _publish_heartbeat(self):
         heartbeat_msg = self._heartbeat.new().json()
         self._mqtt_publish(self._heartbeat_topic, heartbeat_msg)
-        print("Heartbeat published: " + heartbeat_msg)
+        # print("Heartbeat published: " + heartbeat_msg)
 
     def on_channel_status_change(self, msg):
         status = DeviceStatus(self._device_id)

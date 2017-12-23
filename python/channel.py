@@ -9,7 +9,8 @@ class Channel(threading.Thread):
         self._on_status_change = on_status_change
         self._check_interval = check_interval
         self.name = name
-        self.value = 1
+        self.value = "N/A"
+        
 
     def set_callback(self, callback):
         self._on_status_change = callback
@@ -36,3 +37,6 @@ class Channel(threading.Thread):
     def _checking_loop(self):
         pass
 
+
+    def update(self, value):
+        pass
