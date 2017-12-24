@@ -8,12 +8,12 @@ class RelayChannel(Channel):
     def update(self, value):
         self.value = value
         if self.value:
-            print("--T--")
+            #print("--T--")
             GPIO.output(self.PIN,GPIO.HIGH)
         else:
             GPIO.output(self.PIN,GPIO.LOW)
-            print("--F--")
-            
+            #print("--F--")
+        self._publish_status()    
         print("--------------Relay update to: %s--------------" %(self.value))
 
     def _checking_loop(self):

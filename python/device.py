@@ -3,7 +3,7 @@ from channel import Channel
 import paho.mqtt.client as mqtt
 import config
 import time
-
+import datetime
 
 class Device(object):
 
@@ -29,10 +29,16 @@ class Device(object):
         channel.start()
 
     def run(self):
-        while self._mqtt_client.loop:
-            self._publish_heartbeat()
+        count = 0
+        while True:
+            count += 1
+            print(count)
+            #time.sleep(0.1)
+            if count > 5:
+                self._publish_heartbeat()
+                count = 0 
             # print("Current status: ", self._current_status().json(), len(self._channels))
-            time.sleep(self._LOOP_INTERVAL)
+            # time.sleep(self._LOOP_INTERVAL)
             self._mqtt_client.loop()
 
     def _on_mqtt_connect(self, client, userdata, flags, result_code):
@@ -78,7 +84,7 @@ class Device(object):
     def _publish_heartbeat(self):
         heartbeat_msg = self._heartbeat.new().json()
         self._mqtt_publish(self._heartbeat_topic, heartbeat_msg)
-        # print("Heartbeat published: " + heartbeat_msg)
+        print("Heartbeat published: " + heartbeat_msg)
 
     def on_channel_status_change(self, msg):
         status = DeviceStatus(self._device_id)
