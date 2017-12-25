@@ -23,13 +23,12 @@ class Device(object):
         self._mqtt_client.on_message = self._on_mqtt_message
 
 
-        connected = False
-        while not connected:
+        self._connected = False
+        while not self._connecte:
             print("Connecting to MQTT broker %s:%s..." %(config.MQTT_HOST, config.MQTT_PORT))
             self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 120)
             time.sleep(3)
-            if(not self._mqtt_client.disconnect):
-                connected = True
+            if(not self._connected):
                 print("MQTT broker %s:%s connected." %(config.MQTT_HOST, config.MQTT_PORT))
 
     def add_channel(self, channel: Channel):
@@ -57,6 +56,7 @@ class Device(object):
 
 
     def _on_mqtt_connect(self, client, userdata, flags, result_code):
+        self._connecte = True
         print("MQTT server connected with result code " + str(result_code))
         self._mqtt_client.subscribe(self._control_topic)
         self._mqtt_client.subscribe(self._update_topic)
