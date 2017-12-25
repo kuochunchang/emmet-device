@@ -4,6 +4,7 @@ import threading
 
 class Heartbeat(threading.Thread):
     def __init__(self, device_id, device_mqtt_publish):
+        threading.Thread.__init__(self)
         self._device_id = device_id
         self._device_mqtt_publish = device_mqtt_publish
         self._heartbeat = DeviceHeartbeat(self._device_id)
