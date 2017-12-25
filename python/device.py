@@ -1,5 +1,6 @@
 from device_model import *
 from channel import Channel
+from heartbeat import Heartbeat
 import paho.mqtt.client as mqtt
 import config
 import time
@@ -29,17 +30,18 @@ class Device(object):
         channel.start()
 
     def run(self):
-        count = 0
-        while True:
-            count += 1
-            print(count)
-            #time.sleep(0.1)
-            if count > 5:
-                self._publish_heartbeat()
-                count = 0 
-            # print("Current status: ", self._current_status().json(), len(self._channels))
-            # time.sleep(self._LOOP_INTERVAL)
-            self._mqtt_client.loop()
+        Heartbeat(self._device_id, self._mqtt_publish).start()
+        #count = 0
+        # while True:
+        #     count += 1
+        #     print(count)
+        #     #time.sleep(0.1)
+        #     if count > 5:
+        #         self._publish_heartbeat()
+        #         count = 0 
+        #     # print("Current status: ", self._current_status().json(), len(self._channels))
+        #     # time.sleep(self._LOOP_INTERVAL)
+        #     self._mqtt_client.loop()
 
     def _on_mqtt_connect(self, client, userdata, flags, result_code):
         print("MQTT server connected with result code " + str(result_code))
@@ -81,10 +83,10 @@ class Device(object):
         print("---", type(self._current_status().json))
         self._mqtt_publish(self._status_topic, self._current_status().json())
 
-    def _publish_heartbeat(self):
-        heartbeat_msg = self._heartbeat.new().json()
-        self._mqtt_publish(self._heartbeat_topic, heartbeat_msg)
-        print("Heartbeat published: " + heartbeat_msg)
+    # def _publish_heartbeat(self):
+    #     heartbeat_msg = self._heartbeat.new().json()
+    #     self._mqtt_publish(self._heartbeat_topic, heartbeat_msg)
+    #     print("Heartbeat published: " + heartbeat_msg)
 
     def on_channel_status_change(self, msg):
         status = DeviceStatus(self._device_id)
