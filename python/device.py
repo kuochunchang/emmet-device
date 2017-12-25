@@ -21,7 +21,16 @@ class Device(object):
         self._mqtt_client = mqtt.Client()
         self._mqtt_client.on_connect = self._on_mqtt_connect
         self._mqtt_client.on_message = self._on_mqtt_message
-        self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 60)
+
+
+        connected = False
+        while not connected:
+            print("Connecting to MQTT broker %s:%s..." %(config.MQTT_HOST, config.MQTT_PORT))
+            self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 120)
+            time.sleep(3)
+            if(not self._mqtt_client.disconnect):
+                connected = True
+                print("MQTT broker %s:%s connected." %(config.MQTT_HOST, config.MQTT_PORT))
 
     def add_channel(self, channel: Channel):
         self._channels.append(channel)
@@ -31,15 +40,21 @@ class Device(object):
     def run(self):
         count = 0
         while True:
-            count += 1
-            print(count)
-            #time.sleep(0.1)
-            if count > 5:
-                self._publish_heartbeat()
-                count = 0 
-            # print("Current status: ", self._current_status().json(), len(self._channels))
-            # time.sleep(self._LOOP_INTERVAL)
-            self._mqtt_client.loop()
+            try:
+                count += 1
+                print(count)
+                #time.sleep(0.1)
+                if count > 5:
+                    self._publish_heartbeat()
+                    count = 0 
+                # print("Current status: ", self._current_status().json(), len(self._channels))
+                # time.sleep(self._LOOP_INTERVAL)
+                self._mqtt_client.loop()
+            except:
+                print("MQTT Connetion lost, try to reconnect...")
+                self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 60)
+                time.sleep(5)
+
 
     def _on_mqtt_connect(self, client, userdata, flags, result_code):
         print("MQTT server connected with result code " + str(result_code))
@@ -68,8 +83,11 @@ class Device(object):
        
 
     def _mqtt_publish(self, topic, msg):
-        self._mqtt_client.publish(topic, msg)
-        print("Published message to topic: %s: %s" % (topic, msg))
+        try:
+            self._mqtt_client.publish(topic, msg)
+            print("Published message to topic: %s: %s" % (topic, msg))
+        except:
+            print("Publish data fail.")
 
     def _current_status(self):
         status = DeviceStatus(self._device_id)
