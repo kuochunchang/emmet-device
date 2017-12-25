@@ -33,15 +33,11 @@ class Device(object):
         channel.start()
 
     def run(self):
-        count = 0
         while True:
             try:
-                count += 1
                 print(count)
-                time.sleep(0.1)
-                if count > 50:
-                    self._publish_heartbeat()
-                    count = 0 
+                time.sleep(1)
+                self._publish_heartbeat()
                 # print("Current status: ", self._current_status().json(), len(self._channels))
                 # time.sleep(self._LOOP_INTERVAL)
                 self._mqtt_client.loop()
@@ -79,7 +75,7 @@ class Device(object):
        
 
     def _mqtt_publish(self, topic, msg):
-        try:
+        try :
             self._mqtt_client.publish(topic, msg)
             print("Published message to topic: %s: %s" % (topic, msg))
         except:
