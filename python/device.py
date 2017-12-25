@@ -24,7 +24,7 @@ class Device(object):
 
 
         self._connected = False
-        while not self._connecte:
+        while not self._connected:
             print("Connecting to MQTT broker %s:%s..." %(config.MQTT_HOST, config.MQTT_PORT))
             self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 120)
             time.sleep(3)
@@ -56,7 +56,7 @@ class Device(object):
 
 
     def _on_mqtt_connect(self, client, userdata, flags, result_code):
-        self._connecte = True
+        self._connected = True
         print("MQTT server connected with result code " + str(result_code))
         self._mqtt_client.subscribe(self._control_topic)
         self._mqtt_client.subscribe(self._update_topic)
