@@ -77,6 +77,8 @@ class Device(object):
         except:
             print("MQTT broker connection lost, try to reconnect....")
             self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 60)
+        finally:
+            print("----")
 
     def _current_status(self):
         status = DeviceStatus(self._device_id)
