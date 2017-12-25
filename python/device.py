@@ -71,8 +71,12 @@ class Device(object):
        
 
     def _mqtt_publish(self, topic, msg):
-        self._mqtt_client.publish(topic, msg)
-        print("Published message to topic: %s: %s" % (topic, msg))
+        try:
+            self._mqtt_client.publish(topic, msg)
+            print("Published message to topic: %s: %s" % (topic, msg))
+        except:
+            print("MQTT broker connection lost, try to reconnect....")
+            self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 60)
 
     def _current_status(self):
         status = DeviceStatus(self._device_id)
