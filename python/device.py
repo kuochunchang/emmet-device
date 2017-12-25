@@ -38,8 +38,8 @@ class Device(object):
             try:
                 count += 1
                 print(count)
-                #time.sleep(0.1)
-                if count > 5:
+                time.sleep(0.1)
+                if count > 50:
                     self._publish_heartbeat()
                     count = 0 
                 # print("Current status: ", self._current_status().json(), len(self._channels))
@@ -84,6 +84,9 @@ class Device(object):
             print("Published message to topic: %s: %s" % (topic, msg))
         except:
             print("Publish data fail.")
+            print("MQTT Connetion lost, try to reconnect...")
+            self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 60)
+           
 
     def _current_status(self):
         status = DeviceStatus(self._device_id)
