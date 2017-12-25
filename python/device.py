@@ -34,8 +34,8 @@ class Device(object):
         #self._mqtt_client.loop_forever()
         #count = 0
         while True:
-        #     count += 1
-        #     print(count)
+            count += 1
+            print(count)
             time.sleep(1)
         #     if count > 5:
         #         self._publish_heartbeat()
