@@ -13,4 +13,5 @@ class Heartbeat(object):
             self._device_mqtt_publish("/devices/heartbeat", heartbeat_msg)
             print("Heartbeat published: " + heartbeat_msg)
             time.sleep(2)
+            
 

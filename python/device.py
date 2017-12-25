@@ -30,19 +30,19 @@ class Device(object):
         channel.start()
 
     def run(self):
-        Heartbeat(self._device_id, self._mqtt_publish).start()
-        #self._mqtt_client.loop_forever()
-        count = 0
-        while True:
-            count += 1
-            print(count)
-            time.sleep(1)
-        #     if count > 5:
-        #         self._publish_heartbeat()
-        #         count = 0 
-        #     # print("Current status: ", self._current_status().json(), len(self._channels))
-        #     # time.sleep(self._LOOP_INTERVAL)
-            self._mqtt_client.loop()
+       # Heartbeat(self._device_id, self._mqtt_publish).start()
+        self._mqtt_client.loop_forever()
+        # count = 0
+        # while True:
+        #     count += 1
+        #     print(count)
+        #     time.sleep(1)
+        # #     if count > 5:
+        # #         self._publish_heartbeat()
+        # #         count = 0 
+        # #     # print("Current status: ", self._current_status().json(), len(self._channels))
+        # #     # time.sleep(self._LOOP_INTERVAL)
+        #     self._mqtt_client.loop()
 
     def _on_mqtt_connect(self, client, userdata, flags, result_code):
         print("MQTT server connected with result code " + str(result_code))
