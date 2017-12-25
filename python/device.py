@@ -32,7 +32,7 @@ class Device(object):
     def run(self):
         Heartbeat(self._device_id, self._mqtt_publish).start()
         #self._mqtt_client.loop_forever()
-        #count = 0
+        count = 0
         while True:
             count += 1
             print(count)
