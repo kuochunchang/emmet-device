@@ -23,14 +23,14 @@ class Device(object):
         self._mqtt_client.on_connect = self._on_mqtt_connect
         self._mqtt_client.on_message = self._on_mqtt_message
         self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 60)
-        Heartbeat(self._device_id, self._mqtt_publish).start()
+
     def add_channel(self, channel: Channel):
         self._channels.append(channel)
         channel.set_callback(self.on_channel_status_change)
         channel.start()
 
     def run(self):
-       # 
+        Heartbeat(self._device_id, self._mqtt_publish).start()
         self._mqtt_client.loop_forever()
         # count = 0
         # while True:

@@ -1,13 +1,14 @@
 from device_model import DeviceHeartbeat
 import time
+import threading
 
-class Heartbeat(object):
+class Heartbeat(threading.Thread):
     def __init__(self, device_id, device_mqtt_publish):
         self._device_id = device_id
         self._device_mqtt_publish = device_mqtt_publish
         self._heartbeat = DeviceHeartbeat(self._device_id)
    
-    def start(self):
+    def run(self):
         while True:
             heartbeat_msg = self._heartbeat.new().json()
             self._device_mqtt_publish("/devices/heartbeat", heartbeat_msg)
