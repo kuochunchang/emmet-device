@@ -28,7 +28,7 @@ class Device(object):
             print("Connecting to MQTT broker %s:%s..." %(config.MQTT_HOST, config.MQTT_PORT))
             self._mqtt_client.connect(config.MQTT_HOST, config.MQTT_PORT, 120)
             time.sleep(3)
-            if(not self._connected):
+            if(self._connected):
                 print("MQTT broker %s:%s connected." %(config.MQTT_HOST, config.MQTT_PORT))
 
     def add_channel(self, channel: Channel):
