@@ -2,7 +2,7 @@ from channel import Channel
 import time
 import random
 
-class DH11Channel(Channel):
+class DH11ChannelTest(Channel):
     def _checking_loop(self):
         self.value = 0
         last_value = None
