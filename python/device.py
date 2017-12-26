@@ -9,7 +9,6 @@ import threading
 
 class Device(object):
 
-    _LOOP_INTERVAL = 1
     lock = threading.Lock()
 
     def __init__(self, device_id):
